@@ -52,6 +52,15 @@ mv $build_dir/node-v$node_version-linux-x64 $build_dir/vendor/node
 chmod +x $build_dir/vendor/node/bin/*
 PATH=$build_dir/vendor/node/bin:$PATH
 
+# check if user specified npm version in package.json
+npm_semver_range=$(cat $build_dir/package.json | $bp_dir/vendor/jq -r .engines.npm)
+
+# globally upgrade npm to requested version if one was specified
+if [ "$npm_semver_range" != "null" ]; then
+  status "Installing requested npm@$npm_semver_range"
+  npm install -g "npm@$npm_semver_range"
+fi
+
 # Run subsequent node/npm commands from the build path
 cd $build_dir
 
